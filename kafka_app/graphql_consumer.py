@@ -2,6 +2,7 @@ from kafka import KafkaConsumer
 import json
 import httpx
 from agents.github_agent_graphql import analyze_github
+from leetcode.leetcode_graphql_tool import LeetCodeGraphQLTool, extract_leetcode_username
 
 GRAPHQL_URL = "http://localhost:8002/graphql"
 
@@ -18,6 +19,7 @@ print("Listening on 'github_analysis' topic (GraphQL mode)... (Ctrl+C to stop)")
 for message in consumer:
     candidate_id = message.value.get("candidate_id")
     github_url = message.value.get("github_url")
+    leetcode_url = message.value.get("leetcode_url")
     job_id = message.value.get("job_id")
     print(f"\nReceived candidate_id: {candidate_id}, github_url: {github_url}, job_id: {job_id}")
 
@@ -37,5 +39,15 @@ for message in consumer:
         print(f"  Job id={job_id} not found via GraphQL. Skipping.")
         continue
 
+    leetcode_data = None
+    if leetcode_url:
+        try:
+            username = extract_leetcode_username(leetcode_url)
+            print(f"  Fetching LeetCode data for: {username}")
+            leetcode_data = LeetCodeGraphQLTool()._run(username)
+            print(f"  LeetCode data fetched successfully.")
+        except Exception as e:
+            print(f"  Failed to fetch LeetCode data: {e}. Continuing with GitHub-only analysis.")
+
     print(f"  Matching against job: {job['title']}")
-    analyze_github(github_url, job["description"])
+    analyze_github(github_url, job["description"], leetcode_data=leetcode_data)

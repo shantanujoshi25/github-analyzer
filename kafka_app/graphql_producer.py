@@ -21,6 +21,7 @@ for cid in candidate_ids:
             firstName
             lastName
             githubUrl
+            leetcodeUrl
         }
     }
     """
@@ -33,11 +34,12 @@ for cid in candidate_ids:
         continue
 
     github_url = candidate.get("githubUrl")
+    leetcode_url = candidate.get("leetcodeUrl")
     if not github_url:
         print(f"Candidate id={cid} ({candidate['firstName']}) has no GitHub URL. Skipping.")
         continue
 
-    message = {"candidate_id": cid, "github_url": github_url, "job_id": job_id}
+    message = {"candidate_id": cid, "github_url": github_url, "leetcode_url": leetcode_url, "job_id": job_id}
     producer.send("github_analysis", value=message)
     print(f"Sent: {message}")
     time.sleep(1)
