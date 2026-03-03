@@ -1,0 +1,7 @@
+kafka-python-ng==2.2.3
+crewai==1.9.3
+crewai[tools]==1.9.3
+python-dotenv==1.1.1
+strawberry-graphql[fastapi]==0.307.1
+uvicorn==0.34.2
+httpx==0.28.1
